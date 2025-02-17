@@ -32,3 +32,6 @@ package-lock.json
 
 # Public assets die gegenereerd kunnen worden
 public/vite.svg
+
+# Environment variables
+.env
