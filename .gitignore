@@ -22,3 +22,13 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
+# Development build artifacts
+dev-dist/
+
+# Lock files (optioneel, als je niet wilt dat package-lock.json wordt gepusht)
+package-lock.json
+
+# Public assets die gegenereerd kunnen worden
+public/vite.svg
