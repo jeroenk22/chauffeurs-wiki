@@ -3,6 +3,7 @@ import { db } from "../firebase";
 import { collection, getDocs } from "firebase/firestore";
 import { FaSortUp, FaSortDown } from "react-icons/fa";
 import { sortTableData } from "../utils/tableSort";
+import { convertToDutchTime } from "../utils/formatDate";
 
 interface Location {
   id: string;
@@ -119,7 +120,8 @@ const Dashboard: React.FC = () => {
               {selectedLocation.description || "Geen beschrijving beschikbaar"}
             </p>
             <p className="mt-2 text-sm text-gray-500">
-              Laatst gewijzigd: {selectedLocation.lastModified}
+              Laatst gewijzigd:{" "}
+              {convertToDutchTime(selectedLocation.lastModified)}
             </p>
           </div>
         ) : (
