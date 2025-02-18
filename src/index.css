@@ -15,6 +15,14 @@ root {
   -moz-osx-font-smoothing: grayscale;
 }
 
+html,
+body,
+#root {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
 a {
   font-weight: 500;
   color: #646cff;

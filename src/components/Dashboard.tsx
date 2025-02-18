@@ -25,6 +25,9 @@ const Dashboard: React.FC = () => {
   const [notifications, setNotifications] = useState(0);
   const [sortColumn, setSortColumn] = useState<keyof Location>("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [selectedLocation, setSelectedLocation] = useState<Location | null>(
+    null
+  );
 
   useEffect(() => {
     const fetchLocations = async () => {
@@ -67,63 +70,71 @@ const Dashboard: React.FC = () => {
   if (loading) return <p className="text-center">🔄 Laden...</p>;
 
   return (
-    <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">📍 Locaties Dashboard</h1>
-        <div className="relative">
-          <FaBell className="text-2xl cursor-pointer" />
-          {notifications > 0 && (
-            <span className="absolute top-0 right-0 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-              {notifications}
-            </span>
-          )}
+    <div className="flex h-screen w-full">
+      {/* Sidebar met locaties */}
+      <div className="w-1/5 bg-gray-100 p-4 overflow-y-auto h-full">
+        <h2 className="text-xl font-bold mb-4">📍 Locaties</h2>
+        <div className="overflow-y-auto max-h-[80vh]">
+          <table className="w-full border-collapse border border-gray-300">
+            <thead className="sticky top-0 bg-gray-200">
+              <tr>
+                {[
+                  { label: "Naam", key: "name" },
+                  { label: "Plaats", key: "city" },
+                ].map(({ label, key }) => (
+                  <th
+                    key={key}
+                    className="border p-2 cursor-pointer hover:bg-gray-300"
+                    onClick={() => handleSort(key as keyof Location)}
+                  >
+                    {label}{" "}
+                    {sortColumn === key &&
+                      (sortOrder === "asc" ? (
+                        <FaSortUp className="inline ml-1" />
+                      ) : (
+                        <FaSortDown className="inline ml-1" />
+                      ))}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {locations.map((loc) => (
+                <tr
+                  key={loc.id}
+                  className="hover:bg-gray-200 cursor-pointer"
+                  onClick={() => setSelectedLocation(loc)}
+                >
+                  <td className="border p-2">{loc.name}</td>
+                  <td className="border p-2">{loc.city}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
-      <div className="overflow-x-auto max-h-[70vh]">
-        <table className="w-full border-collapse border border-gray-300">
-          <thead className="sticky top-0 bg-gray-100">
-            <tr>
-              {[
-                { label: "Naam", key: "name" },
-                { label: "Adres", key: "address" },
-                { label: "Postcode", key: "postcode" },
-                { label: "Plaats", key: "city" },
-                { label: "Land", key: "country" },
-              ].map(({ label, key }) => (
-                <th
-                  key={key}
-                  className="border p-2 cursor-pointer hover:bg-gray-200"
-                  onClick={() => handleSort(key as keyof Location)}
-                >
-                  {label}{" "}
-                  {sortColumn === key &&
-                    (sortOrder === "asc" ? (
-                      <FaSortUp className="inline ml-1" />
-                    ) : (
-                      <FaSortDown className="inline ml-1" />
-                    ))}
-                </th>
-              ))}
-              <th className="border p-2">Acties</th>
-            </tr>
-          </thead>
-          <tbody>
-            {locations.map((loc) => (
-              <tr key={loc.id} className="hover:bg-gray-50 cursor-pointer">
-                <td className="border p-2">{loc.name}</td>
-                <td className="border p-2">{loc.address}</td>
-                <td className="border p-2">{loc.postcode}</td>
-                <td className="border p-2">{loc.city}</td>
-                <td className="border p-2">{loc.country}</td>
-                <td className="border p-2 text-center">
-                  <button className="text-blue-500 hover:text-blue-700">
-                    <FaEdit />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+
+      {/* Detailweergave in het rechtergedeelte */}
+      <div className="w-4/5 p-6 overflow-y-auto bg-white shadow-md rounded-lg h-full">
+        {selectedLocation ? (
+          <div>
+            <h1 className="text-3xl font-bold mb-2">{selectedLocation.name}</h1>
+            <p className="text-gray-600 text-lg">
+              {selectedLocation.address}, {selectedLocation.city},{" "}
+              {selectedLocation.country}
+            </p>
+            <p className="mt-4 text-gray-700">
+              {selectedLocation.description || "Geen beschrijving beschikbaar"}
+            </p>
+            <p className="mt-2 text-sm text-gray-500">
+              Laatst gewijzigd: {selectedLocation.lastModified}
+            </p>
+          </div>
+        ) : (
+          <p className="text-gray-500 text-lg">
+            Selecteer een locatie om details te bekijken
+          </p>
+        )}
       </div>
     </div>
   );
