@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../firebase";
 import { collection, getDocs } from "firebase/firestore";
-import { FaSortUp, FaSortDown } from "react-icons/fa";
+import { FaSortUp, FaSortDown, FaPlus } from "react-icons/fa";
 import { sortTableData } from "../utils/tableSort";
 import SearchBar from "./SearchBar";
 import { Location } from "../types/types";
+import AddLocationForm from "../components/AddLocationForm";
+import { convertToDutchTime } from "../utils/formatDate";
 
 const Dashboard: React.FC = () => {
   const [locations, setLocations] = useState<Location[]>([]);
@@ -15,6 +17,7 @@ const Dashboard: React.FC = () => {
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(
     null
   );
+  const [isAddingLocation, setIsAddingLocation] = useState(false);
 
   useEffect(() => {
     const fetchLocations = async () => {
@@ -50,7 +53,20 @@ const Dashboard: React.FC = () => {
     <div className="flex h-screen w-full">
       {/* Sidebar met locaties (30%) */}
       <div className="w-3/10 bg-gray-100 p-4 overflow-y-auto h-full">
-        <h2 className="text-xl font-bold mb-4">📍 Locaties</h2>
+        <h2 className="text-xl font-bold mb-4 flex justify-between items-center">
+          📍 Locaties
+          <button
+            onClick={() => {
+              setSelectedLocation(null);
+              setIsAddingLocation(true);
+            }}
+            className="text-blue-500 text-2xl"
+            aria-label="Voeg nieuwe locatie toe"
+          >
+            <FaPlus />
+          </button>
+        </h2>
+
         <SearchBar
           locations={locations}
           onSearchResults={setFilteredLocations}
@@ -85,7 +101,10 @@ const Dashboard: React.FC = () => {
                 <tr
                   key={loc.id}
                   className="hover:bg-gray-200 cursor-pointer"
-                  onClick={() => setSelectedLocation(loc)}
+                  onClick={() => {
+                    setIsAddingLocation(false);
+                    setSelectedLocation(loc);
+                  }}
                 >
                   <td className="border p-2 truncate w-1/2">{loc.name}</td>
                   <td className="border p-2 truncate w-1/2">{loc.city}</td>
@@ -98,7 +117,16 @@ const Dashboard: React.FC = () => {
 
       {/* Detailweergave (70%) */}
       <div className="w-7/10 p-6 overflow-y-auto bg-white shadow-md rounded-lg h-full">
-        {selectedLocation ? (
+        {isAddingLocation ? (
+          <AddLocationForm
+            onCancel={() => setIsAddingLocation(false)}
+            onLocationAdded={(newLocation) => {
+              setLocations((prev) => [...prev, newLocation]);
+              setFilteredLocations((prev) => [...prev, newLocation]);
+              setIsAddingLocation(false);
+            }}
+          />
+        ) : selectedLocation ? (
           <div>
             <h1 className="text-3xl font-bold mb-2">{selectedLocation.name}</h1>
             <p className="text-gray-600 text-lg">
@@ -109,7 +137,8 @@ const Dashboard: React.FC = () => {
               {selectedLocation.description || "Geen beschrijving beschikbaar"}
             </p>
             <p className="mt-2 text-sm text-gray-500">
-              Laatst gewijzigd: {selectedLocation.lastModified}
+              Laatst gewijzigd:{" "}
+              {convertToDutchTime(selectedLocation.lastModified)}
             </p>
           </div>
         ) : (
