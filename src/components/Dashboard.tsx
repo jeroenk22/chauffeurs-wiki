@@ -3,26 +3,12 @@ import { db } from "../firebase";
 import { collection, getDocs } from "firebase/firestore";
 import { FaSortUp, FaSortDown } from "react-icons/fa";
 import { sortTableData } from "../utils/tableSort";
-import { convertToDutchTime } from "../utils/formatDate";
-
-interface Location {
-  id: string;
-  name: string;
-  address: string;
-  status: string;
-  postcode: string;
-  city: string;
-  country: string;
-  description: string;
-  images: string[];
-  lastModified: string;
-  modifiedBy: string;
-  LatLngNewEntry?: { lat: number; lng: number };
-  LatLngLastModified?: { lat: number; lng: number };
-}
+import SearchBar from "./SearchBar";
+import { Location } from "../types/types";
 
 const Dashboard: React.FC = () => {
   const [locations, setLocations] = useState<Location[]>([]);
+  const [filteredLocations, setFilteredLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortColumn, setSortColumn] = useState<keyof Location>("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
@@ -37,7 +23,9 @@ const Dashboard: React.FC = () => {
         id: doc.id,
         ...doc.data(),
       })) as Location[];
-      setLocations(locationData.sort((a, b) => a.name.localeCompare(b.name)));
+
+      setLocations(locationData);
+      setFilteredLocations(locationData);
       setLoading(false);
     };
     fetchLocations();
@@ -51,7 +39,7 @@ const Dashboard: React.FC = () => {
     setSortColumn(column);
     setSortOrder(newOrder);
 
-    setLocations((prevLocations) =>
+    setFilteredLocations((prevLocations) =>
       sortTableData(prevLocations, column, newOrder)
     );
   };
@@ -61,8 +49,13 @@ const Dashboard: React.FC = () => {
   return (
     <div className="flex h-screen w-full">
       {/* Sidebar met locaties (30%) */}
-      <div className="w-[30%] bg-gray-100 p-4 overflow-y-auto h-full flex-shrink-0">
+      <div className="w-3/10 bg-gray-100 p-4 overflow-y-auto h-full">
         <h2 className="text-xl font-bold mb-4">📍 Locaties</h2>
+        <SearchBar
+          locations={locations}
+          onSearchResults={setFilteredLocations}
+        />
+
         <div className="overflow-y-auto max-h-[80vh]">
           <table className="w-full border-collapse border border-gray-300 table-fixed">
             <thead className="sticky top-0 bg-gray-200">
@@ -73,7 +66,7 @@ const Dashboard: React.FC = () => {
                 ].map(({ label, key }) => (
                   <th
                     key={key}
-                    className="border p-2 cursor-pointer hover:bg-gray-300 w-1/2 min-w-[160px]"
+                    className="border p-2 cursor-pointer hover:bg-gray-300 w-1/2"
                     onClick={() => handleSort(key as keyof Location)}
                   >
                     {label}{" "}
@@ -88,18 +81,14 @@ const Dashboard: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {locations.map((loc) => (
+              {filteredLocations.map((loc) => (
                 <tr
                   key={loc.id}
                   className="hover:bg-gray-200 cursor-pointer"
                   onClick={() => setSelectedLocation(loc)}
                 >
-                  <td className="border p-2 truncate w-1/2 min-w-[160px]">
-                    {loc.name}
-                  </td>
-                  <td className="border p-2 truncate w-1/2 min-w-[200px]">
-                    {loc.city}
-                  </td>
+                  <td className="border p-2 truncate w-1/2">{loc.name}</td>
+                  <td className="border p-2 truncate w-1/2">{loc.city}</td>
                 </tr>
               ))}
             </tbody>
@@ -108,7 +97,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Detailweergave (70%) */}
-      <div className="w-[70%] p-6 overflow-y-auto bg-white shadow-md rounded-lg h-full">
+      <div className="w-7/10 p-6 overflow-y-auto bg-white shadow-md rounded-lg h-full">
         {selectedLocation ? (
           <div>
             <h1 className="text-3xl font-bold mb-2">{selectedLocation.name}</h1>
@@ -120,8 +109,7 @@ const Dashboard: React.FC = () => {
               {selectedLocation.description || "Geen beschrijving beschikbaar"}
             </p>
             <p className="mt-2 text-sm text-gray-500">
-              Laatst gewijzigd:{" "}
-              {convertToDutchTime(selectedLocation.lastModified)}
+              Laatst gewijzigd: {selectedLocation.lastModified}
             </p>
           </div>
         ) : (
