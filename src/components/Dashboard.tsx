@@ -1,28 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../firebase";
 import { collection, getDocs } from "firebase/firestore";
-import { FaBell, FaEdit } from "react-icons/fa";
+import { FaBell, FaEdit, FaSortUp, FaSortDown } from "react-icons/fa";
 
 interface Location {
-  id: string; // Automatisch toegekend door Firestore
-  name: string; // Verplicht veld
-  address: string; // Verplicht veld
-  status: string; // Active of Deleted
-  postcode: string; // Verplicht veld
-  city: string; // Verplicht veld
-  country: string; // Verplicht veld
-  description: string; // Verplicht veld (lange tekst)
-  images: string[]; // Geen verplicht veld
-  lastModified: string; // Timestamp wanneer Location wordt gewijzigd
-  modifiedBy: string; // Verplicht veld
-  LatLngNewEntry?: { lat: number; lng: number }; // Coördinaten bij nieuwe invoer
-  LatLngLastModified?: { lat: number; lng: number }; // Coördinaten bij wijziging
+  id: string;
+  name: string;
+  address: string;
+  status: string;
+  postcode: string;
+  city: string;
+  country: string;
+  description: string;
+  images: string[];
+  lastModified: string;
+  modifiedBy: string;
+  LatLngNewEntry?: { lat: number; lng: number };
+  LatLngLastModified?: { lat: number; lng: number };
 }
 
 const Dashboard: React.FC = () => {
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState(0);
+  const [sortColumn, setSortColumn] = useState<keyof Location>("name");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   useEffect(() => {
     const fetchLocations = async () => {
@@ -31,7 +33,7 @@ const Dashboard: React.FC = () => {
         id: doc.id,
         ...doc.data(),
       })) as Location[];
-      setLocations(locationData);
+      setLocations(locationData.sort((a, b) => a.name.localeCompare(b.name)));
       setNotifications(
         locationData.filter((loc) => loc.status === "pending").length
       );
@@ -39,6 +41,28 @@ const Dashboard: React.FC = () => {
     };
     fetchLocations();
   }, []);
+
+  const handleSort = (column: keyof Location) => {
+    const newOrder =
+      sortColumn === column && sortOrder === "asc" ? "desc" : "asc";
+    setSortColumn(column);
+    setSortOrder(newOrder);
+
+    setLocations((prevLocations) =>
+      [...prevLocations].sort((a, b) => {
+        const valueA = a[column];
+        const valueB = b[column];
+
+        if (typeof valueA === "string" && typeof valueB === "string") {
+          return newOrder === "asc"
+            ? valueA.localeCompare(valueB)
+            : valueB.localeCompare(valueA);
+        }
+
+        return 0; // Geen sortering toepassen voor niet-string waarden
+      })
+    );
+  };
 
   if (loading) return <p className="text-center">🔄 Laden...</p>;
 
@@ -55,34 +79,52 @@ const Dashboard: React.FC = () => {
           )}
         </div>
       </div>
-      <table className="w-full border-collapse border border-gray-300">
-        <thead className="sticky top-0 bg-gray-100">
-          <tr>
-            <th className="border p-2">Naam</th>
-            <th className="border p-2">Adres</th>
-            <th className="border p-2">Postcode</th>
-            <th className="border p-2">Plaats</th>
-            <th className="border p-2">Land</th>
-            <th className="border p-2">Acties</th>
-          </tr>
-        </thead>
-        <tbody>
-          {locations.map((loc) => (
-            <tr key={loc.id} className="hover:bg-gray-50 cursor-pointer">
-              <td className="border p-2">{loc.name}</td>
-              <td className="border p-2">{loc.address}</td>
-              <td className="border p-2">{loc.postcode}</td>
-              <td className="border p-2">{loc.city}</td>
-              <td className="border p-2">{loc.country}</td>
-              <td className="border p-2 text-center">
-                <button className="text-blue-500 hover:text-blue-700">
-                  <FaEdit />
-                </button>
-              </td>
+      <div className="overflow-x-auto max-h-[70vh]">
+        <table className="w-full border-collapse border border-gray-300">
+          <thead className="sticky top-0 bg-gray-100">
+            <tr>
+              {[
+                { label: "Naam", key: "name" },
+                { label: "Adres", key: "address" },
+                { label: "Postcode", key: "postcode" },
+                { label: "Plaats", key: "city" },
+                { label: "Land", key: "country" },
+              ].map(({ label, key }) => (
+                <th
+                  key={key}
+                  className="border p-2 cursor-pointer hover:bg-gray-200"
+                  onClick={() => handleSort(key as keyof Location)}
+                >
+                  {label}{" "}
+                  {sortColumn === key &&
+                    (sortOrder === "asc" ? (
+                      <FaSortUp className="inline ml-1" />
+                    ) : (
+                      <FaSortDown className="inline ml-1" />
+                    ))}
+                </th>
+              ))}
+              <th className="border p-2">Acties</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {locations.map((loc) => (
+              <tr key={loc.id} className="hover:bg-gray-50 cursor-pointer">
+                <td className="border p-2">{loc.name}</td>
+                <td className="border p-2">{loc.address}</td>
+                <td className="border p-2">{loc.postcode}</td>
+                <td className="border p-2">{loc.city}</td>
+                <td className="border p-2">{loc.country}</td>
+                <td className="border p-2 text-center">
+                  <button className="text-blue-500 hover:text-blue-700">
+                    <FaEdit />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
