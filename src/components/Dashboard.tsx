@@ -7,6 +7,7 @@ import SearchBar from "./SearchBar";
 import { Location } from "../types/types";
 import AddLocationForm from "../components/AddLocationForm";
 import { convertToDutchTime } from "../utils/formatDate";
+import Button from "./Button";
 
 const Dashboard: React.FC = () => {
   const [locations, setLocations] = useState<Location[]>([]);
@@ -55,16 +56,16 @@ const Dashboard: React.FC = () => {
       <div className="w-3/10 bg-gray-100 p-4 overflow-y-auto h-full">
         <h2 className="text-xl font-bold mb-4 flex justify-between items-center">
           📍 Locaties
-          <button
+          <Button
             onClick={() => {
               setSelectedLocation(null);
               setIsAddingLocation(true);
             }}
-            className="text-blue-500 text-2xl"
-            aria-label="Voeg nieuwe locatie toe"
+            ariaLabel="Voeg nieuwe locatie toe"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center text-lg"
           >
-            <FaPlus />
-          </button>
+            <FaPlus className="mr-1" /> Nieuwe locatie
+          </Button>
         </h2>
 
         <SearchBar

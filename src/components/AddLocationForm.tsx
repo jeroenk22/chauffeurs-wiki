@@ -3,6 +3,7 @@ import { db } from "../firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { Location } from "../types/types";
 import FormInput from "./FormInput";
+import Button from "./Button";
 
 interface AddLocationFormProps {
   onLocationAdded: (newLocation: Location) => void;
@@ -105,20 +106,19 @@ const AddLocationForm: React.FC<AddLocationFormProps> = ({
           textarea
         />
         <div className="flex justify-between">
-          <button
-            type="button"
-            className="bg-gray-400 text-white px-4 py-2 rounded"
+          <Button
             onClick={onCancel}
+            className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded"
           >
             Annuleren
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
-            className="bg-blue-500 text-white px-4 py-2 rounded"
-            disabled={loading}
+            loading={loading}
+            className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded"
           >
-            {loading ? "Toevoegen..." : "Opslaan"}
-          </button>
+            Opslaan
+          </Button>
         </div>
       </form>
     </div>
