@@ -83,7 +83,7 @@ describe("AddLocationForm", () => {
         postcode: "1234AB",
         city: "Rotterdam",
         country: "Nederland",
-        status: "active",
+        locationStatus: "active",
         description: "Test beschrijving",
         images: [],
         lastModified: expect.any(String), // Timestamp
