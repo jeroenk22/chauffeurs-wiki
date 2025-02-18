@@ -17,6 +17,7 @@
     "firebase": "^11.3.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-icons": "^5.4.0",
     "react-router-dom": "^7.1.5",
     "tailwindcss": "^4.0.6",
     "vite-plugin-pwa": "^0.21.1"
@@ -29,6 +30,7 @@
     "@types/react-dom": "^19.0.3",
     "@types/testing-library__user-event": "^4.1.1",
     "@vitejs/plugin-react-swc": "^3.5.0",
+    "dotenv": "^16.4.7",
     "eslint": "^9.19.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.18",
