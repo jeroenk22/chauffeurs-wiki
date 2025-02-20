@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { db } from "../firebase";
+import { db } from "../config/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import { FaSortUp, FaSortDown, FaPlus } from "react-icons/fa";
 import { sortTableData } from "../utils/tableSort";

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { db } from "../firebase";
+import { db } from "../config/firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { Location } from "../types/types";
 import FormInput from "./FormInput";
@@ -35,7 +35,7 @@ const AddLocationForm: React.FC<AddLocationFormProps> = ({
         postcode,
         city,
         country,
-        locationStatus, // ✅ Gebruik de nieuwe naam
+        locationStatus, // Gebruik de nieuwe naam
         description,
         lastModified: new Date().toISOString(),
         modifiedBy: "Admin",
@@ -48,7 +48,7 @@ const AddLocationForm: React.FC<AddLocationFormProps> = ({
         postcode,
         city,
         country,
-        locationStatus, // ✅ Correcte naam in object
+        locationStatus, // Correcte naam in object
         description,
         images: [],
         lastModified: new Date().toISOString(),

@@ -1,6 +1,14 @@
 import { describe, test, expect } from "vitest";
-import { doc, setDoc, getDoc } from "firebase/firestore";
-import { db } from "../firebase";
+import {
+  //collection,
+  setDoc,
+  getDoc,
+  doc,
+  getFirestore,
+} from "firebase/firestore";
+
+// Gebruik de gemockte Firestore-instantie
+const db = getFirestore();
 
 describe("Firestore Tests", () => {
   test("should write and read a document", async () => {
@@ -13,5 +21,5 @@ describe("Firestore Tests", () => {
     const docSnap = await getDoc(testRef);
     expect(docSnap.exists()).toBe(true);
     expect(docSnap.data()?.testField).toBe("testValue");
-  }, 10000); // Verhoog de timeout naar 10 seconden
+  }, 10000);
 });
