@@ -1,7 +1,10 @@
 export const config = {
   useGooglePlaces: import.meta.env.VITE_USE_GOOGLE_PLACES === "true",
   googleApiKey: import.meta.env.VITE_GOOGLE_PLACES_API_KEY || "",
-  freeAlternativeApiKey: import.meta.env.VITE_FREE_ALTERNATIVE_API_KEY || "",
+  locationIqApiKey: import.meta.env.VITE_LOCATIONIQ_API_KEY || "",
+
+  // Gebruik de proxy alleen in ontwikkel- en testomgeving
+  useProxy: import.meta.env.MODE !== "production",
 
   firebaseConfig: {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "",
